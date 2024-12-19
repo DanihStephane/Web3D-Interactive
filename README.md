@@ -63,7 +63,7 @@ cd ~
 3. Start a local server:
 ```bash
 
-# Using Node.js
+# Using local
 
 ```
 
