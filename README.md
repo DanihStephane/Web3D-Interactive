@@ -86,17 +86,7 @@ http://localhost:8000
 ```
 project/
 │
-├── index.html          # Main entry point
-├── styles/            
-│   └── main.css        # Core styles and animations
-│
-├── scripts/
-│   ├── shapes.js       # 3D shape definitions
-│   ├── controls.js     # Mouse interaction
-│   └── animations.js   # Animation logic
-│
-└── assets/
-    └── textures/       # Material textures
+Loading ...
 ```
 
 ## 🎮 User Interface
