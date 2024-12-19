@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Interactif 3D</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        /* ... Styles précédents ... */
+        .shape-menu {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            z-index: 3;
+            max-height: 80vh;
+            overflow-y: auto;
+            width: 200px;
+        }
+
+        .shape-button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(74, 158, 255, 0.2);
+            border: 1px solid #4a9eff;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .shape-button:hover {
+            background: rgba(74, 158, 255, 0.4);
+            transform: scale(1.05);
+        }
+
+        .shape-button.active {
+            background: #4a9eff;
+        }
+    </style>
+</head>
+<body>
+    <div class="shape-menu">
+        <button class="shape-button" data-shape="human">Humain</button>
+        <button class="shape-button" data-shape="cube">Cube</button>
+        <button class="shape-button" data-shape="sphere">Sphère</button>
+        <button class="shape-button" data-shape="pyramid">Pyramide</button>
+        <button class="shape-button" data-shape="torus">Tore</button>
+        <button class="shape-button" data-shape="cylinder">Cylindre</button>
+        <button class="shape-button" data-shape="cone">Cône</button>
+        <button class="shape-button" data-shape="octahedron">Octaèdre</button>
+        <button class="shape-button" data-shape="dodecahedron">Dodécaèdre</button>
+        <button class="shape-button" data-shape="icosahedron">Icosaèdre</button>
+        <button class="shape-button" data-shape="torusKnot">Nœud de Tore</button>
+        <button class="shape-button" data-shape="ring">Anneau</button>
+        <button class="shape-button" data-shape="star">Étoile</button>
+        <button class="shape-button" data-shape="prism">Prisme</button>
+        <button class="shape-button" data-shape="diamond">Diamant</button>
+        <button class="shape-button" data-shape="heart">Cœur</button>
+        <button class="shape-button" data-shape="spiral">Spirale</button>
+        <button class="shape-button" data-shape="helix">Hélice</button>
+        <button class="shape-button" data-shape="mobius">Ruban de Möbius</button>
+        <button class="shape-button" data-shape="infinity">Infini</button>
+    </div>
+
+    <script>
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Éclairage
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(5, 5, 5);
+        scene.add(directionalLight);
+
+        camera.position.z = 5;
+
+        let currentShape = null;
+        const material = new THREE.MeshPhongMaterial({
+            color: 0x4a9eff,
+            specular: 0x4a9eff,
+            shininess: 100,
+        });
+
+        const shapes = {
+            human: () => {
+                const group = new THREE.Group();
+                // Corps
+                const body = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.5, 0.3, 2, 32),
+                    material
+                );
+                group.add(body);
+                // Tête
+                const head = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.4, 32, 32),
+                    material
+                );
+                head.position.y = 1.4;
+                group.add(head);
+                return group;
+            },
+            cube: () => new THREE.Mesh(
+                new THREE.BoxGeometry(2, 2, 2),
+                material
+            ),
+            sphere: () => new THREE.Mesh(
+                new THREE.SphereGeometry(1.2, 32, 32),
+                material
+            ),
+            pyramid: () => new THREE.Mesh(
+                new THREE.ConeGeometry(1.2, 2, 4),
+                material
+            ),
+            torus: () => new THREE.Mesh(
+                new THREE.TorusGeometry(1, 0.4, 16, 100),
+                material
+            ),
+            cylinder: () => new THREE.Mesh(
+                new THREE.CylinderGeometry(0.8, 0.8, 2, 32),
+                material
+            ),
+            cone: () => new THREE.Mesh(
+                new THREE.ConeGeometry(1, 2, 32),
+                material
+            ),
+            octahedron: () => new THREE.Mesh(
+                new THREE.OctahedronGeometry(1.2),
+                material
+            ),
+            dodecahedron: () => new THREE.Mesh(
+                new THREE.DodecahedronGeometry(1.2),
+                material
+            ),
+            icosahedron: () => new THREE.Mesh(
+                new THREE.IcosahedronGeometry(1.2),
+                material
+            ),
+            torusKnot: () => new THREE.Mesh(
+                new THREE.TorusKnotGeometry(0.8, 0.3, 100, 16),
+                material
+            ),
+            ring: () => new THREE.Mesh(
+                new THREE.RingGeometry(0.5, 1.2, 32),
+                material
+            ),
+            star: () => {
+                const geometry = new THREE.BufferGeometry();
+                const vertices = [];
+                for (let i = 0; i < 5; i++) {
+                    const angle = (i * 4 * Math.PI) / 5;
+                    vertices.push(Math.cos(angle), Math.sin(angle), 0);
+                }
+                geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+                return new THREE.Mesh(geometry, material);
+            },
+            prism: () => new THREE.Mesh(
+                new THREE.CylinderGeometry(1, 1, 2, 6),
+                material
+            ),
+            diamond: () => {
+                const geometry = new THREE.OctahedronGeometry(1.2);
+                geometry.scale(1, 1.5, 1);
+                return new THREE.Mesh(geometry, material);
+            },
+            heart: () => {
+                const shape = new THREE.Shape();
+                shape.moveTo(0, 0);
+                shape.bezierCurveTo(0, 1, -1, 1.5, -1, 2.5);
+                shape.bezierCurveTo(-1, 3.5, 0, 3.5, 0, 2.5);
+                shape.bezierCurveTo(0, 3.5, 1, 3.5, 1, 2.5);
+                shape.bezierCurveTo(1, 1.5, 0, 1, 0, 0);
+                const geometry = new THREE.ExtrudeGeometry(shape, {
+                    depth: 0.5,
+                    bevelEnabled: true,
+                    bevelThickness: 0.1,
+                    bevelSize: 0.1,
+                    bevelOffset: 0,
+                    bevelSegments: 5
+                });
+                return new THREE.Mesh(geometry, material);
+            },
+            spiral: () => {
+                const points = [];
+                for (let i = 0; i < 100; i++) {
+                    const t = i / 10;
+                    points.push(
+                        new THREE.Vector3(
+                            Math.cos(t) * (1 - t/10),
+                            t/5,
+                            Math.sin(t) * (1 - t/10)
+                        )
+                    );
+                }
+                const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                return new THREE.Line(geometry, material);
+            },
+            helix: () => {
+                const points = [];
+                for (let i = 0; i < 100; i++) {
+                    const t = i / 10;
+                    points.push(
+                        new THREE.Vector3(
+                            Math.cos(t),
+                            t/5 - 1,
+                            Math.sin(t)
+                        )
+                    );
+                }
+                const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                return new THREE.Line(geometry, material);
+            },
+            mobius: () => {
+                const geometry = new THREE.ParametricGeometry((u, v, target) => {
+                    u *= Math.PI * 2;
+                    v = v * 2 - 1;
+                    const r = 1.5 + v * Math.cos(u/2);
+                    target.set(
+                        r * Math.cos(u),
+                        v * Math.sin(u/2),
+                        r * Math.sin(u)
+                    );
+                }, 50, 50);
+                return new THREE.Mesh(geometry, material);
+            },
+            infinity: () => {
+                const points = [];
+                for (let i = 0; i < 100; i++) {
+                    const t = (i / 50) * Math.PI * 2;
+                    points.push(
+                        new THREE.Vector3(
+                            Math.sin(t) / (1 + Math.cos(t) * Math.cos(t)) * 2,
+                            0,
+                            Math.sin(t) * Math.cos(t) / (1 + Math.cos(t) * Math.cos(t)) * 2
+                        )
+                    );
+                }
+                const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                return new THREE.Line(geometry, material);
+            }
+        };
+
+        function changeShape(shapeName) {
+            if (currentShape) {
+                scene.remove(currentShape);
+            }
+            currentShape = shapes[shapeName]();
+            scene.add(currentShape);
+            
+            // Update active button
+            document.querySelectorAll('.shape-button').forEach(button => {
+                button.classList.remove('active');
+                if (button.dataset.shape === shapeName) {
+                    button.classList.add('active');
+                }
+            });
+        }
+
+        // Event listeners for buttons
+        document.querySelectorAll('.shape-button').forEach(button => {
+            button.addEventListener('click', () => {
+                changeShape(button.dataset.shape);
+            });
+        });
+
+        // Initial shape
+        changeShape('human');
+
+        // Animation
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetRotationX = 0;
+        let targetRotationY = 0;
+
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX - window.innerWidth / 2) / 500;
+            mouseY = (event.clientY - window.innerHeight / 2) / 500;
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (currentShape) {
+                targetRotationX += (mouseY - targetRotationX) * 0.05;
+                targetRotationY += (mouseX - targetRotationY) * 0.05;
+
+                currentShape.rotation.x = targetRotationX;
+                currentShape.rotation.y = targetRotationY;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Responsive
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

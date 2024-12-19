@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Interactif 3D</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            overflow-x: hidden;
+            background: #0a0a0a;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 1;
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 1000;
+            font-size: 24px;
+        }
+
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.5;
+            background: linear-gradient(45deg, #000000, #1a1a1a);
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .client-space {
+            padding: 10px 20px;
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .client-space:hover {
+            transform: scale(1.05);
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            color: white;
+        }
+
+        .contact {
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .contact:hover {
+            color: #4a9eff;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-screen">Chargement du modèle 3D...</div>
+    <div class="background-animation"></div>
+    <div id="canvas-container"></div>
+    
+    <header>
+        <div class="logo">Logo</div>
+        <button class="client-space">Espace Client</button>
+    </header>
+
+    <footer>
+        <div>© 2024 Tous droits réservés</div>
+        <div class="contact">Contact</div>
+    </footer>
+
+    <script>
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // Éclairage
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(5, 5, 5);
+        directionalLight.castShadow = true;
+        scene.add(directionalLight);
+
+        const pointLight = new THREE.PointLight(0x4a9eff, 1);
+        pointLight.position.set(-5, 5, 0);
+        scene.add(pointLight);
+
+        camera.position.z = 3;
+        camera.position.y = 1;
+
+        // Matériaux
+        const skinMaterial = new THREE.MeshPhongMaterial({
+            color: 0xf5d0c1,
+            specular: 0x222222,
+            shininess: 30
+        });
+
+        const eyeMaterial = new THREE.MeshPhongMaterial({ 
+            color: 0x000000,
+            specular: 0xffffff,
+            shininess: 100 
+        });
+
+        const lipMaterial = new THREE.MeshPhongMaterial({ 
+            color: 0xe88b8b,
+            specular: 0x222222,
+            shininess: 30 
+        });
+
+        // Création du corps
+        const bodyGeometry = new THREE.CylinderGeometry(0.25, 0.2, 1, 32);
+        const body = new THREE.Mesh(bodyGeometry, skinMaterial);
+        scene.add(body);
+
+        // Tête
+        const headGeometry = new THREE.SphereGeometry(0.25, 32, 32);
+        const head = new THREE.Mesh(headGeometry, skinMaterial);
+        head.position.y = 0.6;
+        body.add(head);
+
+        // Yeux
+        const eyeGeometry = new THREE.SphereGeometry(0.03, 32, 32);
+        
+        const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+        leftEye.position.set(-0.08, 0.65, 0.2);
+        body.add(leftEye);
+
+        const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+        rightEye.position.set(0.08, 0.65, 0.2);
+        body.add(rightEye);
+
+        // Nez
+        const noseGeometry = new THREE.ConeGeometry(0.03, 0.08, 32);
+        const nose = new THREE.Mesh(noseGeometry, skinMaterial);
+        nose.rotation.x = -Math.PI / 2;
+        nose.position.set(0, 0.6, 0.23);
+        body.add(nose);
+
+        // Bouche
+        const mouthGeometry = new THREE.TorusGeometry(0.05, 0.02, 16, 32, Math.PI);
+        const mouth = new THREE.Mesh(mouthGeometry, lipMaterial);
+        mouth.rotation.x = -Math.PI / 2;
+        mouth.position.set(0, 0.55, 0.2);
+        body.add(mouth);
+
+        // Bras
+        function createArm(isLeft) {
+            const armGroup = new THREE.Group();
+            
+            // Partie supérieure du bras
+            const upperArmGeometry = new THREE.CylinderGeometry(0.05, 0.04, 0.4, 32);
+            const upperArm = new THREE.Mesh(upperArmGeometry, skinMaterial);
+            upperArm.position.y = -0.2;
+            armGroup.add(upperArm);
+
+            // Avant-bras
+            const forearmGeometry = new THREE.CylinderGeometry(0.04, 0.03, 0.4, 32);
+            const forearm = new THREE.Mesh(forearmGeometry, skinMaterial);
+            forearm.position.y = -0.6;
+            armGroup.add(forearm);
+
+            // Main
+            const handGeometry = new THREE.SphereGeometry(0.05, 32, 32);
+            const hand = new THREE.Mesh(handGeometry, skinMaterial);
+            hand.position.y = -0.8;
+            armGroup.add(hand);
+
+            armGroup.position.y = 0.3;
+            armGroup.position.x = isLeft ? -0.3 : 0.3;
+            armGroup.rotation.z = isLeft ? Math.PI / 6 : -Math.PI / 6;
+            
+            return armGroup;
+        }
+
+        const leftArm = createArm(true);
+        const rightArm = createArm(false);
+        body.add(leftArm);
+        body.add(rightArm);
+
+        // Jambes
+        function createLeg(isLeft) {
+            const legGroup = new THREE.Group();
+            
+            // Cuisse
+            const thighGeometry = new THREE.CylinderGeometry(0.07, 0.06, 0.5, 32);
+            const thigh = new THREE.Mesh(thighGeometry, skinMaterial);
+            thigh.position.y = -0.25;
+            legGroup.add(thigh);
+
+            // Mollet
+            const calfGeometry = new THREE.CylinderGeometry(0.06, 0.05, 0.5, 32);
+            const calf = new THREE.Mesh(calfGeometry, skinMaterial);
+            calf.position.y = -0.75;
+            legGroup.add(calf);
+
+            // Pied
+            const footGeometry = new THREE.BoxGeometry(0.1, 0.1, 0.2);
+            const foot = new THREE.Mesh(footGeometry, skinMaterial);
+            foot.position.y = -1.05;
+            foot.position.z = 0.05;
+            legGroup.add(foot);
+
+            legGroup.position.x = isLeft ? -0.15 : 0.15;
+            legGroup.position.y = -0.5;
+            
+            return legGroup;
+        }
+
+        const leftLeg = createLeg(true);
+        const rightLeg = createLeg(false);
+        body.add(leftLeg);
+        body.add(rightLeg);
+
+        // Variables pour l'animation
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetRotationX = 0;
+        let targetRotationY = 0;
+        let time = 0;
+
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX - window.innerWidth / 2) / 1000;
+            mouseY = (event.clientY - window.innerHeight / 2) / 1000;
+        });
+
+        // Animation du fond
+        const backgroundAnimation = document.querySelector('.background-animation');
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Animation du corps
+            targetRotationX += (mouseY - targetRotationX) * 0.05;
+            targetRotationY += (mouseX - targetRotationY) * 0.05;
+
+            body.rotation.x = targetRotationX;
+            body.rotation.y = targetRotationY;
+
+            // Animation de respiration
+            time += 0.03;
+            body.position.y = Math.sin(time) * 0.03;
+            
+            // Animation des bras
+            leftArm.rotation.x = Math.sin(time) * 0.1;
+            rightArm.rotation.x = Math.sin(time + Math.PI) * 0.1;
+
+            // Animation des jambes
+            leftLeg.rotation.x = Math.sin(time) * 0.1;
+            rightLeg.rotation.x = Math.sin(time + Math.PI) * 0.1;
+
+            // Animation du fond
+            const gradientAngle = (Math.sin(time) * 360) % 360;
+            backgroundAnimation.style.background = `
+                linear-gradient(
+                    ${gradientAngle}deg,
+                    rgba(10, 10, 10, 1) 0%,
+                    rgba(26, 26, 26, 1) 50%,
+                    rgba(10, 10, 10, 1) 100%
+                )
+            `;
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize(width, height);
+        });
+
+        document.querySelector('.loading-screen').style.display = 'none';
+        
+        animate();
+    </script>
+</body>
+</html>
