@@ -52,26 +52,24 @@ A modern, interactive 3D web application showcasing various geometric shapes and
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/your-username/interactive-3d-shapes.git
+git clone https://github.com/~
 ```
 
 2. Navigate to project directory:
 ```bash
-cd interactive-3d-shapes
+cd ~
 ```
 
 3. Start a local server:
 ```bash
-# Using Python
-python -m http.server 8000
 
 # Using Node.js
-npx serve
+
 ```
 
 4. Open in browser:
 ```
-http://localhost:8000
+
 ```
 
 ## 🛠️ Technical Stack
