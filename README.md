@@ -52,7 +52,7 @@ A modern, interactive 3D web application showcasing various geometric shapes and
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/~
+git clone git@github.com:DanihStephane/Web3D-Interactive.git
 ```
 
 2. Navigate to project directory:
@@ -155,7 +155,11 @@ Optimizations include:
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+ `LICENSE` free: https://github.com/DanihStephane
+
+## 📞 Contact
+
+- [![My Skills](https://skillicons.dev/icons?i=linkedin)](https://skillicons.dev) : https://www.linkedin.com/in/danihstephane/
 
 ## 🙏 Acknowledgments
 
