@@ -153,6 +153,12 @@ Optimizations include:
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
+## 🙏 Acknowledgments
+
+- Three.js community for excellent documentation
+- Contributors to the core libraries
+- Feedback from the user community
+
 ## 📄 License
 
  `LICENSE` free: https://github.com/DanihStephane
@@ -161,14 +167,4 @@ Optimizations include:
 
 - [![My Skills](https://skillicons.dev/icons?i=linkedin)](https://skillicons.dev) : https://www.linkedin.com/in/danihstephane/
 
-## 🙏 Acknowledgments
 
-- Three.js community for excellent documentation
-- Contributors to the core libraries
-- Feedback from the user community
-
-## 📞 Contact
-
-- Website: [your-website.com](https://your-website.com)
-- Email: contact@your-website.com
-- Twitter: [@yourhandle](https://twitter.com/yourhandle)
